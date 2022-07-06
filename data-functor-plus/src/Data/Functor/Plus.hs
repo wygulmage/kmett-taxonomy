@@ -10,6 +10,7 @@
 
 
 module Data.Functor.Plus (
+Plus (..),
 ) where
 
 
