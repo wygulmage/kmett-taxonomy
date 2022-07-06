@@ -108,6 +108,7 @@ instance (Apply m)=> Apply (G.M1 i info m) where
 
 instance (Semigroup c)=> Apply (G.K1 i c) where
     liftF2 _ = coerce ((<>) :: c -> c -> c)
+    {-# INLINE liftF2 #-}
 
 instance (Apply m, Apply n)=> Apply ((G.:*:) m n) where
     liftF2 f (mx G.:*: nx) (my G.:*: ny) =
