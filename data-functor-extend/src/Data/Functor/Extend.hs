@@ -6,7 +6,7 @@
            , ScopedTypeVariables
            , GADTs
            , DefaultSignatures
-           , Trustworthy
+           , Trustworthy -- lol
   #-}
 #endif
 
