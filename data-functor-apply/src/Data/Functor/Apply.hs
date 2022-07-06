@@ -10,7 +10,9 @@
 #endif
 
 
-module Data.Functor.Apply where
+module Data.Functor.Apply (
+Apply (..),
+) where
 
 
 import Control.Monad (liftM2)
