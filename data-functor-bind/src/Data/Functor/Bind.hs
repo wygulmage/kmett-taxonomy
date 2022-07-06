@@ -20,6 +20,10 @@ import Data.Functor.Identity
 import Data.List.NonEmpty (NonEmpty)
 import Data.Proxy
 
+import qualified Data.Map as Map
+import qualified Data.IntMap as IntMap
+import qualified Data.Sequence as Seq
+
 #if __GLASGOW_HASKELL__ && __GLASGOW_HASKELL__ >= 720
 import qualified GHC.Generics as G
 #endif
@@ -90,6 +94,8 @@ instance (Semigroup c)=> Bind ((,) c) where
 
 instance Bind (Tagged t)
 
+instance Bind Seq.Seq where (>>-) = (>>=)
+
 
 #if __GLASGOW_HASKELL__ && __GLASGOW_HASKELL__ >= 720
 --- Generics ---
@@ -100,12 +106,10 @@ instance Bind G.U1 where _ >>- _ = G.U1
 instance Bind G.Par1 where G.Par1 x >>- f = f x
 
 instance (Bind m)=> Bind (G.Rec1 m) where
-    -- G.Rec1 mx >>- f = G.Rec1 (mx >>- (G.unRec1 . f))
     G.Rec1 mx >>- f = G.Rec1 (mx >>- (coerce f))
     {-# INLINE (>>-) #-}
 
 instance (Bind m)=> Bind (G.M1 i info m) where
-    -- G.M1 mx >>- f = G.M1 (mx >>- (G.unM1 . f))
     G.M1 mx >>- f = G.M1 (mx >>- (coerce f))
     {-# INLINE (>>-) #-}
 
@@ -114,6 +118,7 @@ instance (Bind m, Bind n)=> Bind ((G.:*:) m n) where
         (G.:*:)
             (mx >>- ((\(my G.:*: _) -> my) . f))
             (nx >>- ((\(_ G.:*: ny) -> ny) . f))
+    {-# INLINABLE (>>-) #-}
 
 gbind ::
     (gr ~ G.Rep1 m, G.Generic1 m, Bind gr)=>
