@@ -15,20 +15,23 @@ Apply (..),
 ) where
 
 
+import Control.Applicative (liftA2)
 import Control.Monad (liftM2)
 import Data.Functor.Const
 import Data.Functor.Identity
 import Data.List.NonEmpty (NonEmpty((:|)))
+
+import qualified Data.Map as Map
+import qualified Data.IntMap as IntMap
+import qualified Data.Sequence as Seq
+
 #if __GLASGOW_HASKELL__ && __GLASGOW_HASKELL__ >= 720
 import qualified GHC.Generics as G
 #endif
-#if __GLASGOW_HASKELL__
-import GHC.Exts (build)
-#endif
 #if __GLASGOW_HASKELL__ && __GLASGOW_HASKELL__ >= 781
-import Data.Coerce
+import Data.Coerce (coerce)
 #else
-import Unsafe.coerce
+import Unsafe.Coerce (unsafeCoerce)
 #endif
 
 class (Functor m)=> Apply m where
@@ -46,16 +49,27 @@ instance Apply Identity
 instance Apply Maybe where liftF2 = liftM2
 
 instance Apply [] where
-    liftF2 f xs ys = build $ \ c n ->
-        foldr (\ x zs' ->
-            foldr (\ y zs -> f x y `c` zs) zs' ys) n xs
-    {-# INLINE [~0] liftF2 #-}
+    liftF2 = liftA2
+    {-# INLINE liftF2 #-}
 
-instance Apply NonEmpty where liftF2 = liftM2
+instance Apply NonEmpty where liftF2 = liftA2
 
 instance Apply (Either c) where liftF2 = liftM2
 
 instance (Semigroup c)=> Apply ((,) c)
+
+--- Containers ---
+instance (Ord i)=> Apply (Map.Map i) where
+    liftF2 = Map.intersectionWith
+    {-# INLINE liftF2 #-}
+
+instance Apply IntMap.IntMap where
+    liftF2 = IntMap.intersectionWith
+    {-# INLINE liftF2 #-}
+
+instance Apply Seq.Seq where
+    liftF2 = liftA2
+    {-# INLINE liftF2 #-}
 
 
 #if __GLASGOW_HASKELL__ && __GLASGOW_HASKELL__ >= 720
@@ -105,10 +119,6 @@ gliftF2 f mx my =
     G.to1 (liftF2 f (G.from1 mx) (G.from1 my))
 {-# INLINE gliftF2 #-}
 
-#endif
-
-#ifndef __GLASGOW_HASKELL__
-build k = k (:) []
 #endif
 
 #if __GLASGOW_HASKELL__ && __GLASGOW_HASKELL__ >= 781
