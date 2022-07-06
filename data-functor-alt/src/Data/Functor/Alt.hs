@@ -14,6 +14,8 @@ Alt (..)
 ) where
 
 
+import Data.Tagged
+
 import Control.Applicative (liftA2)
 import Data.Functor.Identity
 import Data.List.NonEmpty (NonEmpty((:|)))
@@ -70,6 +72,9 @@ instance (Semigroup c)=> Alt (Either c) where
     Left x <!> Left y = Left (x <> y)
     _ <!> my = my
     {-# INLINABLE (<!>) #-}
+
+instance Alt (Tagged t)
+
 
 --- Transformers ---
 instance (Alt m)=> Alt (ReaderT i m) where

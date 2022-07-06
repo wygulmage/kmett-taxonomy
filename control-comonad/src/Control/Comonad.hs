@@ -14,6 +14,7 @@ Comonad (..), extend, duplicate,
 
 
 import Data.Functor.Extend
+import Data.Tagged
 
 import Data.Functor.Identity
 import Data.List.NonEmpty (NonEmpty((:|)))
@@ -56,6 +57,7 @@ instance (Monoid c)=> Comonad ((->) c) where
 instance Comonad ((,) c) where
     extract = snd
 
+instance Comonad (Tagged t)
 
 #if __GLASGOW_HASKELL__ && __GLASGOW_HASKELL__ >= 720
 --- Generics ---

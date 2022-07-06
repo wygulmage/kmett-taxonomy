@@ -14,6 +14,7 @@ Bind (..), join,
 ) where
 
 import Data.Functor.Apply
+import Data.Tagged
 
 import Data.Functor.Identity
 import Data.List.NonEmpty (NonEmpty)
@@ -60,6 +61,9 @@ instance (Semigroup c)=> Bind ((,) c) where
     (u, x) >>- f = case f x of
         (v, y) -> (u <> v, y)
     {-# INLINABLE (>>-) #-}
+
+instance Bind (Tagged t)
+
 
 #if __GLASGOW_HASKELL__ && __GLASGOW_HASKELL__ >= 720
 --- Generics ---

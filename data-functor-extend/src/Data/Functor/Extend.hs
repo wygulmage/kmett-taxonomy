@@ -16,6 +16,8 @@ Extend (..), duplicated,
 ) where
 
 
+import Data.Tagged
+
 import Data.Functor.Identity
 import Data.List.NonEmpty (NonEmpty((:|)))
 import Data.Proxy
@@ -75,6 +77,8 @@ instance Extend ((,) c) where
 
 instance Extend (Either c) where
     -- extended f cx = either Left (\_-> Right (f cx)) cx
+
+instance Extend (Tagged t) where extended = coerce
 
 
 #if __GLASGOW_HASKELL__ && __GLASGOW_HASKELL__ >= 720

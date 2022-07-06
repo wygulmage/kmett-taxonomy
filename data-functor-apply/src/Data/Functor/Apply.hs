@@ -15,6 +15,8 @@ Apply (..),
 ) where
 
 
+import Data.Tagged
+
 import Control.Applicative (liftA2)
 import Control.Monad (liftM2)
 import Data.Functor.Const
@@ -62,6 +64,9 @@ instance Apply NonEmpty where liftF2 = liftA2
 instance Apply (Either c) where liftF2 = liftM2
 
 instance (Semigroup c)=> Apply ((,) c)
+
+instance Apply (Tagged t) where liftF2 = coerce
+
 
 --- Containers ---
 instance (Ord i)=> Apply (Map.Map i) where
