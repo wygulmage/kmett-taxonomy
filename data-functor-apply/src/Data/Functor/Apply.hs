@@ -20,6 +20,7 @@ import Control.Monad (liftM2)
 import Data.Functor.Const
 import Data.Functor.Identity
 import Data.List.NonEmpty (NonEmpty((:|)))
+import Data.Proxy
 
 import qualified Data.Map as Map
 import qualified Data.IntMap as IntMap
@@ -47,6 +48,8 @@ class (Functor m)=> Apply m where
 instance Apply IO where liftF2 = liftM2
 
 instance Apply Identity
+
+instance Apply Proxy
 
 instance Apply Maybe where liftF2 = liftM2
 
