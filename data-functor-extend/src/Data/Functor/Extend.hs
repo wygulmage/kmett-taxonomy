@@ -40,6 +40,8 @@ class (Functor m)=> Extend m where
 duplicated :: (Extend m)=> m a -> m (m a)
 duplicated = extended id
 
+instance Extend IO where
+    extended f act = fmap (f . pure) act
 
 instance Extend Identity where
     extended = coerce

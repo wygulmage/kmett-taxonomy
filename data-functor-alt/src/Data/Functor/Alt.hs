@@ -17,6 +17,7 @@ Alt (..)
 import Control.Applicative (liftA2)
 import Data.Functor.Identity
 import Data.List.NonEmpty (NonEmpty((:|)))
+import System.IO.Error
 
 import Control.Monad.Trans.Reader (ReaderT (..), runReaderT)
 
@@ -41,6 +42,16 @@ class (Functor m)=> Alt m where
       (gr ~ G.Rep1 m, G.Generic1 m, Alt gr)=>
       m a -> m a -> m a
     (<!>) = galt
+
+instance Alt IO where
+    act1 <!> act2 =
+        act1 `catchIOError` \ e1 ->
+            act2 `catchIOError` \ e2 ->
+                if isUserError e2 && ioeGetErrorString e2 == "mzero"
+                  then ioError e1
+                  else ioError e2
+    -- This is horrible, but to make <!> a monoid with mzero its neutral value, that's what we have to do.
+    -- Would it make sense to check e1 for mzero first? (If it would prevents a space leak I think yes, otherwise no.)
 
 instance Alt Identity
 

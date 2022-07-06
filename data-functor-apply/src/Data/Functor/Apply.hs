@@ -44,6 +44,8 @@ class (Functor m)=> Apply m where
 
 #endif
 
+instance Apply IO where liftF2 = liftM2
+
 instance Apply Identity
 
 instance Apply Maybe where liftF2 = liftM2
