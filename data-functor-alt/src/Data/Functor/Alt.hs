@@ -17,6 +17,7 @@ Alt (..)
 import Control.Applicative (liftA2)
 import Data.Functor.Identity
 import Data.List.NonEmpty (NonEmpty((:|)))
+import Data.Proxy
 import System.IO.Error
 
 import Control.Monad.Trans.Reader (ReaderT (..), runReaderT)
@@ -54,6 +55,8 @@ instance Alt IO where
     -- Would it make sense to check e1 for mzero first? (If it would prevents a space leak I think yes, otherwise no.)
 
 instance Alt Identity
+
+instance Alt Proxy
 
 instance Alt Maybe where
     mx <!> my | null mx = my | otherwise = mx
