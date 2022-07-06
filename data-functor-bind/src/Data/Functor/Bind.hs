@@ -10,7 +10,7 @@
 #endif
 
 module Data.Functor.Bind (
-Bind (..), join,
+Bind (..), (-<<), (->-), (-<-), join, apDefault, liftB2,
 ) where
 
 import Data.Functor.Apply
@@ -39,8 +39,34 @@ class (Apply m)=> Bind m where
         m a -> (a -> m b) -> m b
     (>>-) = gbind
 
+infixr 1 -<<
+(-<<) :: (Bind m)=> (a -> m b) -> m a -> m b
+(-<<) = flip (>>-)
+{-# INLINE (-<<) #-}
+
 join :: (Bind m)=> m (m a) -> m a
 join = (>>- id)
+
+infixr 1 ->-
+(->-) :: (Bind m)=> (a -> m b) -> (b -> m c) -> a -> m c
+f ->- g = \ x -> f x >>- g
+{-# INLINE (->-) #-}
+
+infixr 1 -<-
+(-<-) :: (Bind m)=> (b -> m c) -> (a -> m b) -> a -> m c
+(-<-) = flip (->-)
+{-# INLINE (-<-) #-}
+
+apDefault :: (Bind m)=> m (a -> b) -> m a -> m b
+apDefault = liftB2 id
+{-# INLINE apDefault #-}
+
+liftB2 :: (Bind m)=> (a -> b -> c) -> m a -> m b -> m c
+{-^ @liftB2@ is a suitable definition of 'liftF2' when you have manually or generically defined '>>-' and 'fmap'.
+-}
+liftB2 f mx my = mx >>- \ x -> fmap (f x) my
+{-# INLINE liftB2 #-}
+
 
 instance Bind IO where (>>-) = (>>=)
 

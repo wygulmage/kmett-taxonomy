@@ -1,9 +1,13 @@
 {-# LANGUAGE CPP
            , TypeFamilies
-           , ScopedTypeVariables
+  #-}
+
+#if __GLASGOW_HASKELL__ >= 702
+{-# LANGUAGE ScopedTypeVariables
            , DefaultSignatures
            , UndecidableInstances
   #-}
+#endif
 
 
 module Data.Functor.Rep where
@@ -24,10 +28,11 @@ import qualified GHC.Generics as G
 
 class (Distributive m)=> Representable m where
     type Rep m
-    type Rep m = Rep (G.Rep1 m) -- UndecidableInstances
     tabulate :: (Rep m -> a) -> m a
     index :: m a -> Rep m -> a
 
+#if __GLASGOW_HASKELL__ >= 702
+    type Rep m = Rep (G.Rep1 m) -- UndecidableInstances
     default tabulate ::
        (g ~ G.Rep1 m, G.Generic1 m, Rep m ~ Rep g, Representable g)=>
        (Rep m -> a) -> m a
@@ -36,6 +41,7 @@ class (Distributive m)=> Representable m where
        (g ~ G.Rep1 m, G.Generic1 m, Rep m ~ Rep g, Representable g)=>
         m a -> Rep m -> a
     index = gindex
+#endif
 
 
 instance Representable ((->) c) where
@@ -52,6 +58,7 @@ instance Representable Proxy
     -- type Rep Proxy = Void
     -- tabulate _ = Proxy
     -- index Proxy = absurd
+
 
 instance Representable (Tagged t) where
     -- Generic version uses (), not Proxy. Not sure whether that's fixable.
@@ -73,7 +80,7 @@ pureRep x = tabulate (pure x)
 {-# INLINE pureRep #-}
 
 apRep :: (Representable m)=> m (a -> b) -> m a -> m b
-apRep mf mx = tabulate (\ z -> (index mf z) (index mx z))
+apRep mf mx = tabulate (\ z -> index mf z (index mx z))
 {-# INLINE apRep #-}
 
 liftR2 :: (Representable m)=> (a -> b -> c) -> m a -> m b -> m c
