@@ -46,6 +46,9 @@ decided = decide id
 instance Decide (Op r) where
     decide f (Op g) (Op h) = Op (either g h . f)
 
+instance Decide Predicate where
+    decide f (Predicate g) (Predicate h) = Predicate (either g h . f)
+
 instance Decide Proxy
 
 instance (Apply m, Decide n)=> Decide (Compose m n)

@@ -48,6 +48,9 @@ concluded = conclude id
 instance Conclude (Op r) where
     conclude f = Op (absurd . f)
 
+instance Conclude Predicate where
+    conclude f = Predicate (absurd . f)
+
 instance Conclude Proxy
 
 instance (Apply m, Applicative m, Conclude n)=> Conclude (Compose m n)

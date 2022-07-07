@@ -17,6 +17,7 @@ import Data.Functor.Contravariant.Conclude
 
 import Data.Functor.Compose (Compose)
 import Data.Functor.Contravariant
+import Data.Monoid (All(..))
 import Data.Proxy
 import Data.Void
 
@@ -66,6 +67,11 @@ instance Representable (Op r) where
     type Rep (Op r) = r
     tabulate = Op
     index = getOp
+
+instance Representable Predicate where
+    type Rep Predicate = All -- ^ Results are combined with '&&'.
+    tabulate = coerce
+    index = coerce
 
 instance Representable Proxy
 
