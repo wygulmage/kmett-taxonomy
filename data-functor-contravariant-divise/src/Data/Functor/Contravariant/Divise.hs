@@ -94,7 +94,6 @@ instance (Apply m, Divise n)=> Divise ((G.:.:) m n) where
         {-# INLINE diviseComp1 #-}
     {-# INLINE divise #-}
 
-
 gdivise ::
         (gr ~ G.Rep1 m, G.Generic1 m, Divise gr)=>
         (a -> (b, c)) -> m b -> m c -> m a

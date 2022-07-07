@@ -30,7 +30,12 @@ import Unsafe.Coerce (unsafeCoerce)
 #endif
 
 
-class (Contravariant m)=> Decidable m where
+class (Divisible m)=> Decidable m where
+{-^ @Decidable@ is supposedly to @Divisible@ what @Alternative@ is to @Applicative@.
+An 'Applicative' is a monoidal covariant functor with respect to @(,)@, witnessed by @liftA2 (,) :: m a -> m b -> m (a, b)@ and @pure () :: m ()@.
+A 'Divisible' is a monoidal contravariant functor with respect to @(,)@, witnessed by @divided :: m a -> m b -> m (a, b)@ and @conquer :: m ()@.
+A 'Decidable' is a monoidal contravariant functor with respect to @Either@, witnessed by @chosen :: m a -> m b -> m (Either a b)@ and @lost :: m Void@.
+-}
     lose :: (a -> Void) -> m a
     choose :: (a -> Either b c) -> m b -> m c -> m a
 
@@ -89,10 +94,11 @@ instance (Decidable m)=> Decidable (G.M1 i info m) where
     lose f = G.M1 (lose f)
 
 
-instance (Monoid c)=> Decidable (G.K1 i c) where
-    choose _ = coerce ((<>) :: c -> c -> c)
-    {-# INLINE choose #-}
-    lose _ = G.K1 mempty
+-- This is wrong; instead it should use a addition operation that distributes over a multiplicative monoid used by Divisible.
+-- instance (Monoid c)=> Decidable (G.K1 i c) where
+--     choose _ = coerce ((<>) :: c -> c -> c)
+--     {-# INLINE choose #-}
+--     lose _ = G.K1 mempty
 
 instance (Decidable m, Decidable n)=> Decidable ((G.:*:) m n) where
     choose f (mx G.:*: nx) (my G.:*: ny) =
