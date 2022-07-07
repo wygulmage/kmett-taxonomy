@@ -10,7 +10,9 @@
 #endif
 
 
-module Data.Functor.Contravariant.Decide where
+module Data.Functor.Contravariant.Decide (
+Decide (..), decided,
+) where
 
 import Data.Functor.Apply -- for Compose instance
 
