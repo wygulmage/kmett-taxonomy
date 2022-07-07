@@ -24,10 +24,17 @@ lose :: (Decidable m)=> (a -> Void) -> m a
 lose = conclude
 {-# INLINE lose #-}
 
-choose :: (Decidable m)=>  (a -> Either b c) -> m b -> m c -> m a
+choose :: (Decidable m)=> (a -> Either b c) -> m b -> m c -> m a
 choose = decide
 {-# INLINE choose #-}
 
+chosen :: (Decidable m)=>  m b -> m c -> m (Either b c)
+chosen = decided
+{-# INLINE chosen #-}
+
+lost :: (Decidable m)=> m Void
+lost = lose id
+{-# INLINE lost #-}
 
 instance (Monoid r)=> Decidable (Op r)
 
