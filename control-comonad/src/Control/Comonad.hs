@@ -39,6 +39,8 @@ class (Functor m)=> Comonad m where
     duplicate :: m a -> m (m a)
     duplicate = extend id
 
+    -- Because extend and duplicate are interdefined, we can't use generics for them.
+
     default extract :: (g ~ G.Rep1 m, G.Generic1 m, Comonad g)=> m a -> a
     extract = gextract
 
