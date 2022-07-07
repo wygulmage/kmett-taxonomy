@@ -69,7 +69,7 @@ instance Representable (Op r) where
     index = getOp
 
 instance Representable Predicate where
-    type Rep Predicate = All -- ^ Results are combined with '&&'.
+    type Rep Predicate = All -- ^ Results are combined with '&&'. Adjunctions lib uses Bool.
     tabulate = coerce
     index = coerce
 
@@ -95,7 +95,9 @@ instance (Representable m)=> Representable (G.M1 i info m) where
 instance (Representable m, Representable n)=> Representable ((G.:*:) m n) where
     type Rep ((G.:*:) m n) = (Rep m, Rep n)
     tabulate f = tabulate (fst . f) G.:*: tabulate (snd . f)
+    {-# INLINABLE tabulate #-}
     index (mx G.:*: nx) x = (index mx x, index nx x)
+    {-# INLINABLE index #-}
 
 gtabulate :: (gr ~ G.Rep1 m, G.Generic1 m, Representable gr)=> (a -> Rep gr) -> m a
 gtabulate = G.to1 . tabulate
