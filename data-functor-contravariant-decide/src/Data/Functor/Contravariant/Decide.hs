@@ -19,6 +19,7 @@ import Data.Functor.Apply -- for Compose instance
 import Data.Functor.Contravariant
 import Data.Functor.Compose (Compose(..))
 import Data.Functor.Const (Const(..))
+import Data.Proxy
 
 #if __GLASGOW_HASKELL__ && __GLASGOW_HASKELL__ >= 720
 import qualified GHC.Generics as G
@@ -45,6 +46,7 @@ decided = decide id
 instance Decide (Op r) where
     decide f (Op g) (Op h) = Op (either g h . f)
 
+instance Decide Proxy
 
 instance (Apply m, Decide n)=> Decide (Compose m n)
 

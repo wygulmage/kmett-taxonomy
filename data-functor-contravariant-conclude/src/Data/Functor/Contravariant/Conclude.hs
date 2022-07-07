@@ -18,6 +18,7 @@ import Data.Functor.Contravariant.Decide
 
 import Data.Functor.Compose (Compose)
 import Data.Functor.Contravariant
+import Data.Proxy
 import Data.Void
 
 #if __GLASGOW_HASKELL__ && __GLASGOW_HASKELL__ >= 720
@@ -46,6 +47,8 @@ concluded = conclude id
 
 instance Conclude (Op r) where
     conclude f = Op (absurd . f)
+
+instance Conclude Proxy
 
 instance (Apply m, Applicative m, Conclude n)=> Conclude (Compose m n)
 
