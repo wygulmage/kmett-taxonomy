@@ -32,12 +32,15 @@ import Unsafe.Coerce (unsafeCoerce)
 
 class (Decide m)=> Conclude m where
     conclude :: (a -> Void) -> m a
+
     default conclude ::
         (gr ~ G.Rep1 m, G.Generic1 m, Conclude gr)=>
         (a -> Void) -> m a
     conclude = gconclude
 
 concluded :: (Conclude m)=> m Void
+{-^ This should be the class method; the derived method should be @conclude f = contramap f concluded@.
+-}
 concluded = conclude id
 
 
