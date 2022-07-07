@@ -117,7 +117,7 @@ This instance trivially satisfies the laws because it never applies the function
 instance (Extend m, Extend n)=> Extend ((G.:+:) m n) where
     extended f mnx = case mnx of
         G.L1 mx -> G.L1 (extended (f . G.L1) mx)
-        G.R1 mx -> G.R1 (extended (f . G.R1) mx)
+        G.R1 nx -> G.R1 (extended (f . G.R1) nx)
     {-# INLINABLE extended #-}
 
 

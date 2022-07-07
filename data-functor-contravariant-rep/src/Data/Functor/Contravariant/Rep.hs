@@ -13,8 +13,6 @@ Representable (..), contramapRep, diviseRep, conquerRep, decideRep, concludedRep
 ) where
 
 
-import Data.Functor.Contravariant.Conclude
-
 import Data.Functor.Compose (Compose)
 import Data.Functor.Contravariant
 import Data.Monoid (All(..))
@@ -25,7 +23,7 @@ import qualified GHC.Generics as G
 import Data.Coerce (coerce)
 
 
-class (Conclude m)=> Representable m where
+class (Contravariant m)=> Representable m where
     type Rep m
     tabulate :: (a -> Rep m) -> m a
     index :: m a -> a -> Rep m
@@ -69,7 +67,7 @@ instance Representable (Op r) where
     index = getOp
 
 instance Representable Predicate where
-    type Rep Predicate = All -- ^ Results are combined with '&&'. Adjunctions lib uses Bool.
+    type Rep Predicate = Bool -- ^ Results are combined with '&&', so this should be 'Data.Monoid.All'.
     tabulate = coerce
     index = coerce
 
