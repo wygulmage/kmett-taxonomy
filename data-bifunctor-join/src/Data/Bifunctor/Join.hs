@@ -12,6 +12,7 @@ newtype Join p a = Join (p a a)
 runJoin :: Join p a -> p a a
 runJoin (Join pxy) = pxy
 
+
 instance (Bitraversable p)=> Traversable (Join p) where
     traverse f (Join pxy) = fmap Join (bitraverse f f pxy)
 

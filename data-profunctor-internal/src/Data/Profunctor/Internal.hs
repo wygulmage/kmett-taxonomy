@@ -3,11 +3,11 @@
 module Data.Profunctor.Internal where
 
 
+import Data.Profunctor.Types.Star
+import Data.Tagged
+
 import Control.Arrow (Kleisli (..), runKleisli, (^<<), (^>>))
 import Data.Coerce
-
-
-import Data.Tagged
 
 
 class Profunctor p where
@@ -26,6 +26,13 @@ class Profunctor p where
 
     (.#) :: (Coercible a a')=> p a b -> q a' a -> p a' b
     (.#) f _ = lmap coerce f
+
+
+instance (Functor m)=> Profunctor (Star m) where
+    lmap f (Star k) = Star (k . f)
+    rmap = fmap
+    (#.) _ (Star k) = Star (fmap coerce . k)
+    (.#) k _ = coerce k
 
 instance Profunctor (->) where
     lmap = flip (.)
