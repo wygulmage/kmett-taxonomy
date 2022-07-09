@@ -13,6 +13,7 @@ import Data.Profunctor.Types.Star
 
 import qualified Control.Monad.Trans.Reader as Reader
 
+
 #if __GLASGOW_HASKELL__ && __GLASGOW_HASKELL__ >= 720
 import qualified GHC.Generics as G
 #endif
@@ -27,6 +28,13 @@ class (Monad m)=> MonadReader i m | m -> i where
     reader = greader
     default local :: (G.Generic1 m, MonadReader i (G.Rep1 m))=> (i -> i) -> m a -> m a
     local = glocal
+
+ask :: (MonadReader i m)=> m i
+ask = reader id
+
+asks :: (MonadReader i m)=> (i -> a) -> m a
+asks = reader
+{-# INLINE asks #-}
 
 
 instance MonadReader i ((->) i) where
