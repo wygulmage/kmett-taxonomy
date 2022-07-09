@@ -31,7 +31,9 @@ class Profunctor p where
 instance (Functor m)=> Profunctor (Star m) where
     lmap f (Star k) = Star (k . f)
     rmap = fmap
+    {-# INLINE rmap #-}
     (#.) _ (Star k) = Star (fmap coerce . k)
+    {-# INLINABLE (#.) #-}
     (.#) k _ = coerce k
 
 instance Profunctor (->) where
