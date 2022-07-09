@@ -16,6 +16,9 @@ import Data.Foldable
 import Data.Functor.Identity (Identity(..), runIdentity)
 import Data.List.NonEmpty (NonEmpty(..))
 import GHC.Exts (augment)
+
+import Data.Tagged
+
 #if __GLASGOW_HASKELL__ && __GLASGOW_HASKELL__ >= 720
 import qualified GHC.Generics as G
 #endif
@@ -37,7 +40,7 @@ class (Foldable m)=> Foldable1 m where
 
 
 instance Foldable1 Identity where
-    foldMap1 = gfoldMap1
+    foldMap1 = coerce
 
 instance Foldable1 NonEmpty where
     toNonEmpty = id
@@ -46,13 +49,20 @@ instance Foldable1 NonEmpty where
         loop y (y' : ys') = f y <> loop y' ys'
         loop y [] = f y
 
+instance Foldable1 ((,) c) where
+    foldMap1 f = f . snd
+
+instance Foldable1 (Tagged t) where
+    foldMap1 = coerce
+
+
+
+#if __GLASGOW_HASKELL__ && __GLASGOW_HASKELL__ >= 720
 
 appendNEList :: NonEmpty a -> [a] -> NonEmpty a
 appendNEList (x :| xs) xs' = x :| augment (\ c n -> foldr c n xs) xs'
 {-# INLINE [~0] appendNEList #-}
 
-
-#if __GLASGOW_HASKELL__ && __GLASGOW_HASKELL__ >= 720
 --- Generics ---
 absurd1 :: G.V1 a -> b
 absurd1 v1 = case v1 of {}
