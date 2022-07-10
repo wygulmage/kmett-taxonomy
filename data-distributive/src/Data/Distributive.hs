@@ -8,19 +8,21 @@
 
 module Data.Distributive where
 
+import Data.Profunctor.Types.Star
+import Data.Tagged
+
 import Control.Monad (join)
+import Data.Functor.Compose (Compose (..))
 import Data.Functor.Identity (Identity (..))
+import qualified Data.Functor.Product as Functor
 import Data.Coerce
 import Data.Proxy
 #if __GLASGOW_HASKELL__ >= 702
 import qualified GHC.Generics as G
 #endif
 
-import Data.Tagged
 
-
-
-class (Monad m)=> Distributive m where
+class (Functor m)=> Distributive m where
     {-^ In Haskell, every @Distributive@ functor is a @Representable@ functor, which means it admits a unique instance of @Monad@ (And, for that matter, 'MonadZip').
     -}
     collect :: (Functor n)=> (a -> m b) -> n a -> m (n b)
@@ -52,6 +54,18 @@ instance Distributive (Tagged t) where
         :: forall m a b. (Functor m)=> (a -> Tagged t b) -> m a -> Tagged t (m b)
     {-# INLINE collect #-}
 
+instance (Distributive m)=> Distributive (Star m i) where
+    -- collect :: (Functor n)=> (a -> Star m i b) -> n a -> Star m i (n b)
+    -- collect ~~ (Functor n)=> (a -> i -> m b) -> n a -> i -> m (n b)
+    collect f nx = Star (\ i -> collect (\ x -> runStar (f x) i) nx)
+
+-- WARNING: ORPHAN INSTANCE
+instance {-# OVERLAPPABLE #-} (Monad m, Distributive m, Monad n)=> Monad (Compose m n) where
+    Compose mnx >>= f =
+        Compose $ fmap join $ mnx >>= collect (coerce f)
+    {-# INLINE (>>=) #-}
+
+instance (Distributive m, Distributive n)=> Distributive (Functor.Product m n)
 
 #if __GLASGOW_HASKELL__ >= 702
 --- Generics ---
@@ -80,17 +94,17 @@ instance (Distributive m, Distributive n)=> Distributive ((G.:*:) m n) where
             collect (\ (mx G.:*: _) -> mx) omnx G.:*:
             collect (\ (_ G.:*: nx) -> nx) omnx
         {-# INLINE distributePair #-}
-    {-# INLINE collect #-}
+    {-# INLINABLE collect #-}
 
 -- WARNING: ORPHAN INSTANCE
-instance {-# OVERLAPPABLE #-} (Distributive m, Monad n)=> Monad ((G.:.:) m n) where
+instance {-# OVERLAPPABLE #-} (Monad m, Distributive m, Monad n)=> Monad ((G.:.:) m n) where
     G.Comp1 mnx >>= f =
         G.Comp1 $ fmap join $ mnx >>= collect (coerce f)
     {-# INLINE (>>=) #-}
 
 instance (Distributive m, Distributive n)=> Distributive ((G.:.:) m n) where
     collect f = G.Comp1 . fmap distribute . collect (coerce f)
-    {-# INLINABLE collect #-}
+    {-# INLINE collect #-}
 
 gcollect ::
     (g ~ G.Rep1 m, G.Generic1 m, Distributive g, Functor n)=>
