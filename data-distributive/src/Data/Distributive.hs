@@ -30,10 +30,8 @@ class (Monad m)=> Distributive m where
         (a -> m b) -> n a -> m (n b)
     collect = gcollect
 
-
 distribute :: (Distributive m, Functor n)=> n (m a) -> m (n a)
 distribute = collect id
-
 
 
 instance Distributive ((->) c) where
@@ -105,9 +103,9 @@ instance (Distributive m, Distributive n)=> Distributive ((G.:*:) m n) where
     {-# INLINE collect #-}
 
 -- WARNING: ORPHAN INSTANCE
-instance (Distributive m, Monad n)=> Monad ((G.:.:) m n) where
+instance {-# OVERLAPPABLE #-} (Distributive m, Monad n)=> Monad ((G.:.:) m n) where
     G.Comp1 mnx >>= f =
-        G.Comp1 (fmap join $ mnx >>= collect (coerce f))
+        G.Comp1 $ fmap join $ mnx >>= collect (coerce f)
     {-# INLINE (>>=) #-}
 
 instance (Distributive m, Distributive n)=> Distributive ((G.:.:) m n) where

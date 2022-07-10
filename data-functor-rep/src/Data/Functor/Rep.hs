@@ -160,6 +160,7 @@ instance (Representable m, Representable n)=> Representable ((G.:.:) m n) where
     index (G.Comp1 mnx) = uncurry (index . index mnx)
     {-# INLINE index #-}
 
+
 gtabulate ::
    (g ~ G.Rep1 m, G.Generic1 m, Rep m ~ Rep g, Representable g)=>
    (Rep m -> a) -> m a

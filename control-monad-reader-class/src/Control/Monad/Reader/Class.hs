@@ -9,6 +9,7 @@
 
 module Control.Monad.Reader.Class where
 
+import Data.Distributive (Distributive)
 import Data.Profunctor.Types.Star
 
 import qualified Control.Monad.Trans.Reader as Reader
@@ -45,9 +46,9 @@ instance (Monad m)=> MonadReader i (Reader.ReaderT i m) where
     reader = Reader.reader
     local = Reader.local
 
-instance (Monad m)=> MonadReader i (Star m i) where
-    reader f = Star (pure . f)
-    local f (Star g) = Star (g . f)
+instance (Monad m)=> MonadReader i (Star m i) -- where
+    -- reader f = Star (pure . f)
+    -- local f (Star g) = Star (g . f)
 
 
 #if __GLASGOW_HASKELL__ && __GLASGOW_HASKELL__ >= 720
@@ -72,12 +73,19 @@ instance (MonadReader i m)=> MonadReader i (G.M1 j meta m) where
     reader = greader'
     local = glocal'
 
-instance (Applicative m)=> GReader i ((G.:.:) ((->) i) m) where
-    greader' f = G.Comp1 (pure . f)
+-- If MonadReader only required Applicative, we could do useful generic deriving using :.:. Of if there was a (Representable m, Monad n)=> Monad (m :.: n) instance.
+instance (MonadReader i m, Applicative n)=> GReader i ((G.:.:) m n) where
+    greader' f = G.Comp1 (reader (pure . f))
     {-# INLINE greader' #-}
-instance GLocal i ((G.:.:) ((->) i) m) where
-    glocal' f (G.Comp1 g) = G.Comp1 (g . f)
+instance (MonadReader i m)=> GLocal i ((G.:.:) m n) where
+    glocal' f (G.Comp1 mnx) = G.Comp1 (local f mnx)
     {-# INLINE glocal' #-}
+instance
+    (Distributive m, MonadReader i m, Monad n)=>
+    MonadReader i ((G.:.:) m n)
+  where
+    reader = greader'
+    local = glocal'
 
 
 greader :: (G.Generic1 m, GReader i (G.Rep1 m))=> (i -> r) -> m r
