@@ -67,7 +67,8 @@ instance Representable (Op r) where
     index = getOp
 
 instance Representable Predicate where
-    type Rep Predicate = Bool -- ^ Results are combined with '&&', so this should be 'Data.Monoid.All'.
+    -- ^ Results are combined with '&&', so @Rep Predicate@ should be 'Data.Monoid.All'.
+    type Rep Predicate = Bool
     tabulate = coerce
     index = coerce
 

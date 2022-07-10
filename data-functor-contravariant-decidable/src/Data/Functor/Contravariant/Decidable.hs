@@ -31,11 +31,11 @@ import Unsafe.Coerce (unsafeCoerce)
 
 
 class (Divisible m)=> Decidable m where
-{-^ @Decidable@ is supposedly to @Divisible@ what @Alternative@ is to @Applicative@.
-An 'Applicative' is a monoidal covariant functor with respect to @(,)@, witnessed by @liftA2 (,) :: m a -> m b -> m (a, b)@ and @pure () :: m ()@.
-A 'Divisible' is a monoidal contravariant functor with respect to @(,)@, witnessed by @divided :: m a -> m b -> m (a, b)@ and @conquer :: m ()@.
-A 'Decidable' is a monoidal contravariant functor with respect to @Either@, witnessed by @chosen :: m a -> m b -> m (Either a b)@ and @lost :: m Void@.
--}
+    {-^ @Decidable@ is supposedly to @Divisible@ what @Alternative@ is to @Applicative@.
+    An 'Applicative' is a monoidal covariant functor with respect to @(,)@, witnessed by @liftA2 (,) :: m a -> m b -> m (a, b)@ and @pure () :: m ()@.
+    A 'Divisible' is a monoidal contravariant functor with respect to @(,)@, witnessed by @divided :: m a -> m b -> m (a, b)@ and @conquer :: m ()@.
+    A 'Decidable' is a monoidal contravariant functor with respect to @Either@, witnessed by @chosen :: m a -> m b -> m (Either a b)@ and @lost :: m Void@.
+    -}
     lose :: (a -> Void) -> m a
     choose :: (a -> Either b c) -> m b -> m c -> m a
 

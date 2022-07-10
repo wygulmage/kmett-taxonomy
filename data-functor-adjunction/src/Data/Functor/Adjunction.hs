@@ -22,8 +22,8 @@ import Data.Functor.Rep
 
 
 class (Functor m, Representable r)=> Adjunction m r | m -> r, r -> m where
-{-^ This class defines "canonical" adjunctions. Because of the functional dependences, two isomorphic types cannot be adjoint to the same functor.
--}
+    {-^ This class defines "canonical" adjunctions. Because of the functional dependences, two isomorphic types cannot be adjoint to the same functor.
+    -}
     leftAdjunct :: (m a -> b) -> a -> r b
     rightAdjunct :: (a -> r b) -> m a -> b
 

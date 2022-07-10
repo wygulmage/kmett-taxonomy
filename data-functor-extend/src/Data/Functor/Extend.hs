@@ -28,7 +28,7 @@ import qualified GHC.Generics as G
 #if __GLASGOW_HASKELL__ && __GLASGOW_HASKELL__ >= 781
 import Data.Coerce
 #else
-import Unsafe.coerce
+import Unsafe.Coerce
 coerce = unsafeCoerce
 #endif
 
@@ -109,9 +109,9 @@ instance (Extend m)=> Extend (G.M1 i info m) where
     {-# INLINE extended #-}
 
 instance Extend (G.K1 i c) where
-{-^ Law: extended f . extended g = extended (f . extended g)
-This instance trivially satisfies the laws because it never applies the functions. Because 'ComonadApply' requires 'Comonad', we don't need to worry about creating incompatible instances.
--}
+    {-^ Law: extended f . extended g = extended (f . extended g)
+    This instance trivially satisfies the laws because it never applies the functions. Because 'ComonadApply' requires 'Comonad', we don't need to worry about creating incompatible instances.
+    -}
     extended _ (G.K1 u) = G.K1 u
 
 instance (Extend m, Extend n)=> Extend ((G.:+:) m n) where

@@ -21,8 +21,8 @@ import Data.Tagged
 
 
 class (Monad m)=> Distributive m where
-{-^ In Haskell, every @Distributive@ functor is a @Representable@ functor, which means it admits a unique instance of @Monad@ (And, for that matter, 'MonadZip').
--}
+    {-^ In Haskell, every @Distributive@ functor is a @Representable@ functor, which means it admits a unique instance of @Monad@ (And, for that matter, 'MonadZip').
+    -}
     collect :: (Functor n)=> (a -> m b) -> n a -> m (n b)
 
     default collect ::
