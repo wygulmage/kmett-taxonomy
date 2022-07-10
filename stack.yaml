@@ -53,6 +53,8 @@ packages:
 - data-functor-yoneda
 - data-profunctor-choice
 - data-profunctor-internal
+- data-profunctor-rep
+- data-profunctor-sieve
 - data-profunctor-strong
 - data-profunctor-types-star
 - data-semigroup-foldable
