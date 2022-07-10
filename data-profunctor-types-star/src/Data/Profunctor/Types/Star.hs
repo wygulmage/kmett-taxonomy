@@ -1,3 +1,7 @@
+{-# LANGUAGE CPP #-}
+#if __GLASGOW_HASKELL__ && __GLASGOW_HASKELL__ >= 720
+{-# LANGUAGE DeriveGeneric #-}
+#endif
 
 
 module Data.Profunctor.Types.Star where
@@ -5,8 +9,15 @@ module Data.Profunctor.Types.Star where
 
 import Control.Applicative
 
+#if __GLASGOW_HASKELL__ && __GLASGOW_HASKELL__ >= 720
+import qualified GHC.Generics as G
+#endif
 
 newtype Star m a b = Star (a -> m b)
+#if __GLASGOW_HASKELL__ && __GLASGOW_HASKELL__ >= 720
+  deriving (G.Generic, G.Generic1)
+#endif
+
 runStar :: Star m a b -> a -> m b
 runStar (Star f) = f
 

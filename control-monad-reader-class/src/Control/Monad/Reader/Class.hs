@@ -59,12 +59,18 @@ instance (MonadReader i m)=> GReader i (G.Rec1 m) where
     greader' = coerce (reader :: (i -> a) -> m a) :: forall a. (i -> a) -> G.Rec1 m a
 instance (MonadReader i m)=> GLocal i (G.Rec1 m) where
     glocal' = coerce (local :: (i -> i) -> m a -> m a) :: forall a. (i -> i) -> G.Rec1 m a -> G.Rec1 m a
+instance (MonadReader i m)=> MonadReader i (G.Rec1 m) where
+    reader = greader'
+    local = glocal'
 
 instance (MonadReader i m)=> GReader i (G.M1 j meta m) where
     greader' = coerce (reader :: (i -> a) -> m a) :: forall a. (i -> a) -> G.M1 j meta m a
 instance (MonadReader i m)=> GLocal i (G.M1 j meta m) where
     glocal' = coerce (local :: (i -> i) -> m a -> m a)
         :: forall a. (i -> i) -> G.M1 j meta m a -> G.M1 j meta m a
+instance (MonadReader i m)=> MonadReader i (G.M1 j meta m) where
+    reader = greader'
+    local = glocal'
 
 instance (Applicative m)=> GReader i ((G.:.:) ((->) i) m) where
     greader' f = G.Comp1 (pure . f)
