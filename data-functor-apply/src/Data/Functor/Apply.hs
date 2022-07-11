@@ -65,6 +65,8 @@ instance Apply (Either c) where liftF2 = liftM2
 
 instance (Semigroup c)=> Apply ((,) c)
 
+instance (Semigroup c)=> Apply (Const c)
+
 instance Apply (Tagged t) where liftF2 = coerce
 
 
