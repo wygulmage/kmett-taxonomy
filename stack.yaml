@@ -31,6 +31,7 @@ resolver:
 #   - wai
 packages:
 - control-comonad
+- control-lens-combinators-base
 - control-monad-reader-class
 - control-monad-state-class
 - data-bifunctor-clown
