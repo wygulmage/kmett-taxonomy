@@ -40,13 +40,15 @@ s ^.. o = foldrOf o (:) [] s
 toNonEmptyOf :: Getting (NonEmptyDList a) s a -> s -> NonEmpty a
 toNonEmptyOf o s = getNonEmptyDList (foldMapOf o singletonNonEmptyDList s) []
 
--- foldlOf' o f z s = foldrOf o f' id s z
---   where
---     f' x k z' = k $! f z' x
---     {-# INLINE f' #-}
-foldlOf' o f z s = foldl' f z (s ^.. o)
+foldlOf' o f z s = foldrOf o f' id s z
+  where
+    f' x k z' = k $! f z' x
+    {-# INLINE f' #-}
+{-# INLINE foldlOf' #-}
+-- foldlOf' o f z s = foldl' f z (s ^.. o)
 
 foldMapOf' o f = foldlOf' o (\ z x -> z <> f x) mempty
+{-# INLINE foldMapOf' #-}
 
 
 (%~) :: ASetter s t a b -> (a -> b) -> s -> t
