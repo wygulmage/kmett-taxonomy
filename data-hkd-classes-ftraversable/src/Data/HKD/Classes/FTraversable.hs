@@ -13,6 +13,7 @@ FFoldable, ffoldMap, ffoldMapGeneric,
 
 import Data.HKD.Classes.FFunctor
 
+import Control.Applicative (liftA2)
 import Data.Functor.Compose
 import Data.Functor.Const
 import Data.Functor.Identity
@@ -21,6 +22,7 @@ import qualified Data.Functor.Sum as Functor
 import Data.Proxy
 
 import Data.Coerce (Coercible, coerce)
+
 import GHC.Generics
 
 
@@ -148,5 +150,3 @@ f .# _ = coerce f
 
 infixl 8 #.
 ( #. ) :: (Coercible c b)=> p b c -> (a -> b) -> a -> c
-( #. ) _ = coerce
-{-# INLINE ( #. ) #-}
