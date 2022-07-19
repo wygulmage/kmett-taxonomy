@@ -150,3 +150,5 @@ f .# _ = coerce f
 
 infixl 8 #.
 ( #. ) :: (Coercible c b)=> p b c -> (a -> b) -> a -> c
+( #. ) _ = coerce
+{-# INLINE ( #. ) #-}

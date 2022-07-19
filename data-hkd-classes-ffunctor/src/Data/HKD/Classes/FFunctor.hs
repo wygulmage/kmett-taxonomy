@@ -5,6 +5,9 @@
            , RankNTypes
            , ScopedTypeVariables
            , TypeFamilies
+           , DerivingStrategies
+           , GeneralizedNewtypeDeriving
+           , StandaloneDeriving
   #-}
 
 module Data.HKD.Classes.FFunctor (FFunctor (..)) where
@@ -44,13 +47,8 @@ instance FFunctor V1 where ffmap _ v1 = case v1 of {}
 instance FFunctor U1 where ffmap _ _ = U1
 instance FFunctor (K1 p c) where ffmap _ = coerce
 
-instance (FFunctor t)=> FFunctor (Rec1 t) where
-    ffmap f = Rec1 #. ffmap f .# unRec1
-    {-# INLINE ffmap #-}
-
-instance (FFunctor t)=> FFunctor (M1 i info t) where
-    ffmap f = M1 #. ffmap f .# unM1
-    {-# INLINE ffmap #-}
+deriving instance (FFunctor t)=> FFunctor (Rec1 t)
+deriving instance (FFunctor t)=> FFunctor (M1 i info t)
 
 instance (Functor l, FFunctor t)=> FFunctor ((:.:) l t) where
     ffmap f = Comp1 #. fmap (ffmap f) .# unComp1
@@ -67,10 +65,6 @@ instance (FFunctor t1, FFunctor t2)=> FFunctor ((:+:) t1 t2) where
 
 
 --- Helpers ---
-
-(.:) :: (c -> c') -> (a -> b -> c) -> a -> b -> c'
-(.:) f = f `seq` \ g x y -> f (g x y)
-{-# INLINE (.:) #-}
 
 infixr 9 .#
 ( .# ) :: (Coercible b a)=> (b -> c) -> p a b -> a -> c

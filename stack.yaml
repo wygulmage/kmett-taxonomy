@@ -51,7 +51,10 @@ packages:
 - data-functor-extend
 - data-functor-plus
 - data-functor-rep
+- data-functor-rep-internal
 - data-functor-yoneda
+- data-hkd-classes-ffunctor
+- data-hkd-classes-ftraversable
 - data-profunctor-choice
 - data-profunctor-internal
 - data-profunctor-rep
