@@ -61,6 +61,9 @@ instance Representable ((->) i) where
 --     scatter g f tn = case g (ffmap (Identity #. absurdV1 . f) tn) of {}
 --     {-# INLINE scatter #-}
 
+class GIndex m where
+    gindex :: m a -> GKey m -> a
+
 class GTabulate m where
     gtabulate :: (GKey m -> a) -> m a
 
@@ -86,17 +89,23 @@ type family GKey1 m where
     GKey1 ((:*:) m1 m2) = (:+:) (GKey1 m1) (GKey1 m2)
     GKey1 ((:+:) m1 m2) = (:+:) (GKey1 m1) (GKey1 m2)
 
+instance GIndex ((->) i) where gindex = id
 instance GTabulate ((->) i) where gtabulate = id
 
+instance GIndex U1 where gindex _ = absurd
 instance GTabulate U1 where gtabulate _ = U1
 instance Representable U1 where scatter _ _ _ = U1
 
+instance GIndex Par1 where gindex (Par1 x) _ = x
 instance GTabulate Par1 where gtabulate f = coerce f ()
 instance Representable Par1 where
     scatter g f = Par1 #. g . ffmap ((Identity . unPar1) #. f)
 
+deriving instance (GIndex m)=> GIndex (Rec1 m)
 deriving instance (GTabulate m)=> GTabulate (Rec1 m)
 deriving instance (Representable m)=> Representable (Rec1 m)
+
+deriving instance (GIndex m)=> GIndex (M1 i info m)
 deriving instance (GTabulate m)=> GTabulate (M1 i info m)
 deriving instance (Representable m)=> Representable (M1 i info m)
 
@@ -105,11 +114,16 @@ fstPro1 (m1 :*: _) = m1
 sndPro1 :: (:*:) m1 m2 a -> m2 a
 sndPro1 (_ :*: m2) = m2
 
+instance (GIndex m1, GIndex m2)=> GIndex ((:*:) m1 m2) where
+    gindex (m1 :*: m2) = either (gindex m1) (gindex m2)
+    {-# INLINABLE gindex #-}
 instance (GTabulate m1, GTabulate m2)=> GTabulate ((:*:) m1 m2) where
     gtabulate f = gtabulate (f . Left) :*: gtabulate (f . Right)
+    {-# INLINABLE gtabulate #-}
 instance (Representable m1, Representable m2)=> Representable ((:*:) m1 m2) where
     -- scatter :: (FFunctor t)=> (t Identity -> r) -> (forall x. n x -> (m1 :*: m2) x) -> t n -> (m1 :*: m2) r
     scatter g nt tn = let tp = ffmap nt tn in scatter g fstPro1 tp :*: scatter g sndPro1 tp
+    {-# INLINABLE scatter #-}
 
 eitherSum1 :: (m1 a -> r) -> (m2 a -> r) -> (:+:) m1 m2 a -> r
 eitherSum1 f _ (L1 m1) = f m1
