@@ -15,6 +15,7 @@ Plus (..),
 
 
 import Data.Functor.Alt
+import Data.Functor.Yoneda
 
 import Control.Monad (mzero)
 import Data.Proxy (Proxy(..))
@@ -40,6 +41,10 @@ instance Plus Maybe where zero = Nothing
 instance Plus [] where zero = []
 
 instance (Monoid c)=> Plus (Either c) where zero = Left mempty
+
+instance (Plus m)=> Plus (Yoneda m) where
+    zero = Yoneda $ \_-> zero
+    {-# INLINE zero #-}
 
 
 #if __GLASGOW_HASKELL__ && __GLASGOW_HASKELL__ >= 720

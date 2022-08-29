@@ -45,7 +45,6 @@ class (Functor m)=> Apply m where
         (gr ~ G.Rep1 m, G.Generic1 m, Apply gr)=>
         (a -> b -> c) -> m a -> m b -> m c
     liftF2 = gliftF2
-
 #endif
 
 instance Apply IO where liftF2 = liftM2
@@ -76,7 +75,7 @@ instance (Apply m)=> Apply (Yoneda m) where
 
 liftF2Yoneda :: (Apply m)=> (a -> b -> c) ->  Yoneda m a -> m b -> Yoneda m c
 liftF2Yoneda f mx my = Yoneda $ \ g ->
-    liftF2 id (runYoneda mx (\ x y -> g $ f x y)) my
+    liftF2 id (runYoneda mx $ \ x y -> g $ f x y) my
 {-# INLINABLE liftF2Yoneda #-}
 
 

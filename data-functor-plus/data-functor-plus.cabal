@@ -19,7 +19,8 @@ library
   exposed-modules:     Data.Functor.Plus
   -- other-modules:
   other-extensions:    CPP, DefaultSignatures, GADTs, ScopedTypeVariables
-  build-depends:       base >=4.7 && <5,
-                       data-functor-alt
+  build-depends:       base >=4.7 && <5
+                     , data-functor-alt
+                     , data-functor-yoneda
   hs-source-dirs:      src
   default-language:    Haskell2010

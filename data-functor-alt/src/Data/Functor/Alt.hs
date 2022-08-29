@@ -14,6 +14,7 @@ Alt (..)
 ) where
 
 
+import Data.Functor.Yoneda
 import Data.Tagged
 
 import Control.Applicative (liftA2)
@@ -72,6 +73,10 @@ instance (Semigroup c)=> Alt (Either c) where
     Left x <!> Left y = Left (x <> y)
     _ <!> my = my
     {-# INLINABLE (<!>) #-}
+
+instance (Alt m)=> Alt (Yoneda m) where
+    mx <!> my = Yoneda $ \ g -> runYoneda mx g <!> runYoneda my g
+    {-# INLINE (<!>) #-}
 
 instance Alt (Tagged t)
 

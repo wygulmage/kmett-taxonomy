@@ -6,9 +6,10 @@
            , DefaultSignatures
            , BangPatterns
 --           , TypeFamilies
+--           , RankNTypes
   #-}
 
-module Data.Functor.WithIndex where
+module Data.Functor.WithIndex (FunctorWithIndex (..)) where
 
 
 import qualified Data.IntMap as IntMap
@@ -23,6 +24,8 @@ import Data.Void
 import qualified GHC.Generics as G
 import qualified GHC.Exts as Exts
 
+
+-- newtype YonedaWithIndex i m a = YonedaWithIndex (forall r. (i -> a -> r) -> m r)
 
 class (Functor m)=> FunctorWithIndex i m | m -> i where
     imap :: (i -> a -> b) -> m a -> m b
