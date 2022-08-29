@@ -72,14 +72,31 @@ instance Functor (Codensity m) where
 
 instance (Applicative m, Foldable m)=> Foldable (Codensity m) where
     fold = fold . lowerCodensity
+    {-# INLINE fold #-}
     foldMap f = fold . (`runCodensity` (pure . f))
+    {-# INLINABLE foldMap #-}
     foldl f z = foldl f z . lowerCodensity
+    {-# INLINE foldl #-}
     foldr f z = foldr f z . lowerCodensity
+    {-# INLINE foldr #-}
     foldl' f z = foldl' f z . lowerCodensity
+    {-# INLINE foldl' #-}
     foldr' f z = foldr' f z . lowerCodensity
+    {-# INLINE foldr' #-}
     foldl1 f = foldl1 f . lowerCodensity
+    {-# INLINE foldl1 #-}
     foldr1 f = foldr1 f . lowerCodensity
+    {-# INLINE foldr1 #-}
     length = length . lowerCodensity
+    {-# INLINE length #-}
     elem x = elem x . lowerCodensity
+    {-# INLINE elem #-}
     maximum = maximum . lowerCodensity
+    {-# INLINE maximum #-}
     minimum = minimum . lowerCodensity
+    {-# INLINE minimum #-}
+
+-- instance (Monad m, Traversable m)=> Traversable (Codensity m) where
+--     -- traverse f = fmap liftCodensity . traverse f . lowerCodensity
+--      traverse f mx = fmap liftCodensity $ sequenceA $ runCodensity mx (pure . f)
+--      sequenceA = fmap liftCodensity . sequenceA . lowerCodensity
