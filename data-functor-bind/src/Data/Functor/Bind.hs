@@ -15,6 +15,7 @@ Bind (..), (-<<), (->-), (-<-), join, apDefault, liftB2,
 
 import Data.Functor.Apply
 import Data.Tagged
+import Data.Functor.Yoneda
 
 import Data.Functor.Identity
 import Data.List.NonEmpty (NonEmpty)
@@ -93,6 +94,14 @@ instance (Semigroup c)=> Bind ((,) c) where
     {-# INLINABLE (>>-) #-}
 
 instance Bind (Tagged t)
+
+instance (Bind m)=> Bind (Yoneda m) where
+    (>>-) = bindYoneda . lowerYoneda
+    {-# INLINE (>>-) #-}
+
+bindYoneda :: (Bind m)=> m a -> (a -> Yoneda m b) -> Yoneda m b
+bindYoneda mx f = Yoneda $ \ g -> mx >>- \ x -> runYoneda (f x) g
+{-# INLINABLE bindYoneda #-}
 
 instance Bind Seq.Seq where (>>-) = (>>=)
 

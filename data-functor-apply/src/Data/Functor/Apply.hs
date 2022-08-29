@@ -15,6 +15,7 @@ Apply (..),
 ) where
 
 
+import Data.Functor.Yoneda
 import Data.Tagged
 
 import Control.Applicative (liftA2)
@@ -68,6 +69,15 @@ instance (Semigroup c)=> Apply ((,) c)
 instance (Semigroup c)=> Apply (Const c)
 
 instance Apply (Tagged t) where liftF2 = coerce
+
+instance (Apply m)=> Apply (Yoneda m) where
+    liftF2 f mx = liftF2Yoneda f mx . lowerYoneda
+    {-# INLINE liftF2 #-}
+
+liftF2Yoneda :: (Apply m)=> (a -> b -> c) ->  Yoneda m a -> m b -> Yoneda m c
+liftF2Yoneda f mx my = Yoneda $ \ g ->
+    liftF2 id (runYoneda mx (\ x y -> g $ f x y)) my
+{-# INLINABLE liftF2Yoneda #-}
 
 
 --- Containers ---

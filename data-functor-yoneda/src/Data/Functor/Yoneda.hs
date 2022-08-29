@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes
+{-# LANGUAGE RankNTypes -- GHC 6.8.1
   #-}
 -- Because this requires RankNTypes, it shouldn't be a dependency of modules that don't require RankNTypes. Otherwise it would be a dependency of the whole `data-functor` hierarchy.
 
@@ -6,7 +6,7 @@
 module Data.Functor.Yoneda (
 Yoneda (..), runYoneda,
 lowerYoneda, liftYoneda,
-apYoneda, bindYoneda,
+apYoneda,
 ) where
 
 import Control.Applicative
@@ -21,9 +21,11 @@ import Control.Monad.Reader.Class
 newtype Yoneda m a = Yoneda (forall r. (a -> r) -> m r)
 runYoneda :: Yoneda m a -> (a -> r) -> m r
 runYoneda (Yoneda k) = k
+{-# INLINE runYoneda #-}
 
 lowerYoneda :: Yoneda m a -> m a
 lowerYoneda = (`runYoneda` id)
+{-# INLINABLE lowerYoneda #-}
 
 liftYoneda :: (Functor m)=> m a -> Yoneda m a
 liftYoneda mx = Yoneda (`fmap` mx)
@@ -56,11 +58,14 @@ zipWithYoneda f mx my = Yoneda $ \ g ->
 
 instance (Fail.MonadFail m)=> Fail.MonadFail (Yoneda m) where
     fail str = Yoneda $ \_-> Fail.fail str
+    {-# INLINE fail #-}
 
 instance (Monad m)=> Monad (Yoneda m) where
     {-^ If possible, do not use 'Yoneda'\'s 'Monad' instance; instead, use a free 'Monad' like @Codensity@. -}
     (>>=) = bindYoneda . lowerYoneda
+    {-# INLINE (>>=) #-}
     (>>) = (*>)
+    {-# INLINE (>>) #-}
 
 bindYoneda :: (Monad m)=> m a -> (a -> Yoneda m b) -> Yoneda m b
 bindYoneda mx f = Yoneda $ \ g -> mx >>= \ x -> runYoneda (f x) g
@@ -68,14 +73,20 @@ bindYoneda mx f = Yoneda $ \ g -> mx >>= \ x -> runYoneda (f x) g
 
 instance (Alternative m)=> Alternative (Yoneda m) where
     empty = Yoneda $ pure empty
+    {-# INLINE empty #-}
     Yoneda k1 <|> Yoneda k2 = Yoneda $ liftA2 (<|>) k1 k2
+    {-# INLINE (<|>) #-}
 
 instance (Applicative m)=> Applicative (Yoneda m) where
     {-^ If possible, do not use 'Yoneda'\'s 'Applicative' instance; instead, use a free 'Applicative' (or 'Monad'). -}
     pure x = Yoneda $ \ g -> pure $ g x
+    {-# INLINE pure #-}
     (<*>) mf = apYoneda mf . lowerYoneda
+    {-# INLINE (<*>) #-}
     mx <* my = Yoneda $ \ g -> runYoneda mx g <* lowerYoneda my
+    {-# INLINE (<*) #-}
     (*>) = thenYoneda . lowerYoneda
+    {-# INLINE (*>) #-}
 
 apYoneda :: (Applicative m)=> Yoneda m (a -> b) -> m a -> Yoneda m b
 apYoneda mf mx = Yoneda $ \ g -> runYoneda mf (g .) <*> mx
@@ -88,4 +99,6 @@ thenYoneda mx my = Yoneda $ \ g -> mx *> runYoneda my g
 
 instance Functor (Yoneda m) where
     fmap f (Yoneda k) = Yoneda $ \ g -> k (g . f)
+    {-# INLINE fmap #-}
     x <$ Yoneda k = Yoneda $ \ g -> k $ \_-> g x
+    {-# INLINE (<$) #-}
